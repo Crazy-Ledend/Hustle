@@ -1,0 +1,138 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hustle</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+
+    <!-- Monaco Loader -->
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+</head>
+<body>
+
+<div class="app">
+
+    <header>
+        <h1>🗒️ Hustle</h1>
+        <p>Your personal todo, reminders & code space</p>
+    </header>
+
+    <!-- LOGS -->
+    <div class="card logs-card">
+        <h2>
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            Recent Logs
+        </h2>
+
+        <ul class="logs-list">
+            {% for log in recent_logs %}
+                <li class="log-item {% if forloop.last %}faded{% endif %}">
+                    <span class="log-text">- {{ log.title|title }}</span>
+                    <span class="log-time">
+                        {{ log.completed_at|date:"H:i" }}
+                    </span>
+                </li>
+            {% empty %}
+                <li class="log-empty">No completed tasks yet</li>
+            {% endfor %}
+        </ul>
+
+        <a href="/logs/" class="logs-btn">
+            Show more →
+        </a>
+    </div>
+
+    <!-- TODO -->
+    <section class="card">
+        <h2><i class="fa-solid fa-list-check"></i> Todos</h2>
+
+        <form method="post" class="add-form">
+            {% csrf_token %}
+            <input type="text" name="title" placeholder="Add a task..." required>
+            <button type="submit" style="background-color: #171a23;">
+            <i class="fa-solid fa-plus"></i>
+            </button>
+        </form>
+
+        <ul class="todo-list">
+            {% for todo in todos %}
+            <li id="task-{{ todo.id }}"
+                class="todo-item {% if todo.completed %}done{% endif %}">
+                
+                <div class="todo-main"
+                    data-id="{{ todo.id }}">
+                    <input type="checkbox"
+                        class="todo-checkbox"
+                        data-id="{{ todo.id }}"
+                        {% if todo.completed %}checked{% endif %}>
+
+                    <span class="todo-title">
+                        {{ todo.title }}
+                    </span>
+                </div>
+
+                <div class="actions">
+                    <button class="delete-btn"
+                            data-id="{{ todo.id }}"
+                            title="Delete">
+                        <i class="fa-solid fa-trash trash"></i>
+                    </button>
+                </div>
+            </li>
+            {% empty %}
+            <li class="empty">
+                <i class="fa-regular fa-face-smile"></i>
+                No tasks yet
+            </li>
+            {% endfor %}
+        </ul>
+        </section>
+
+    <!-- EDITOR TOGGLE -->
+    <button id="toggleEditor" class="toggle-btn">
+        <i class="fa-solid fa-code"></i> Code Editor
+    </button>
+
+    <!-- CODE EDITOR -->
+    <section class="card editor hidden" id="editorSection">
+        <div class="editor-header">
+            <select id="lang" class="selector">
+                <option value="python">Python</option>
+                <option value="java">Java</option>
+            </select>
+
+            <button onclick="runCode() "><i class="fa-solid fa-play" id="run-btn"></i></button>
+        </div>
+
+        <div id="editor"></div>
+
+        <pre id="output">// Console</pre>
+    </section>
+
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+{{ due|json_script:"reminders-data" }}
+<script>
+    const REMINDERS = JSON.parse(
+        document.getElementById("reminders-data").textContent
+    ).map(r => r.title);
+
+    // const REMINDERS = [
+    //     {% for t in due %}
+    //         "{{ t.title|escapejs }}",
+    //     {% endfor %}
+    // ];
+</script>
+
+<script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>

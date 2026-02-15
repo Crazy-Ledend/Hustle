@@ -1,0 +1,41 @@
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hustle</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <section class="card logs-page">
+        <div class="logs-header">
+            <h2>
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                Completed Tasks
+            </h2>
+            <a href="/" class="logs-back-btn">
+                ← Back
+            </a>
+        </div>
+        <ul class="logs-list">
+            {% for task in tasks %}
+                <li class="log-row">
+                    <div class="log-main">
+                        <span class="log-title">{{ task.title }}</span>
+                        <span class="log-dates">
+                            Created {{ task.created_at|date:"M d, H:i" }}
+                            · Completed {{ task.completed_at|date:"M d, H:i" }}
+                        </span>
+                    </div>
+
+                    <i class="fa-solid fa-check log-icon"></i>
+                </li>
+            {% empty %}
+                <li class="log-empty">
+                    No completed tasks yet
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+</body>
+</html>
